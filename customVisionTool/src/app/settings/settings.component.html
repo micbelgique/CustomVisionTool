@@ -1,0 +1,10 @@
+<mat-card class='settings'>
+        <mat-form-field class="example-full-width">
+          <input matInput placeholder="Put customvision endpoint" [(ngModel)]="endpoint">
+        </mat-form-field>
+      
+        <mat-form-field class="example-full-width">
+            <input matInput placeholder="Put customvision key" [(ngModel)]="key">
+          </mat-form-field>
+      <button mat-raised-button color="primary" (click)="setEndpointsAndKey()" class="example-full-width">Save</button>
+</mat-card>
