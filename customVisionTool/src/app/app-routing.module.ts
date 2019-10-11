@@ -5,8 +5,8 @@ import { SettingsComponent } from './settings/settings.component';
 
 
 const routes: Routes = [
-  { path: 'settings', component: SettingsComponent},
-  { path: '**', component: DetectorComponent }
+  { path: 'scanner', component: DetectorComponent},
+  { path: '**', component: SettingsComponent }
 ];
 
 @NgModule({
