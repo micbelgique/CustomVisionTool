@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 // tslint:disable-next-line:max-line-length
-import { User, HubService, Challenge, ChallengeService, Team } from '@oneroomic/oneroomlibrary';
 import { MatDialog, MatBottomSheet } from '@angular/material';
 import { CustomVisionPredictionService, ImagePrediction } from '@oneroomic/facecognitivelibrary';
 import { BottomSheetDetailComponent } from '../bottom-sheet-detail/bottom-sheet-detail.component';
@@ -16,17 +15,15 @@ import { Observable } from 'rxjs';
 })
 export class DetectorComponent implements OnInit, OnDestroy {
   private headers: HttpHeaders;
-  private team: Team;
-  private challenge: Challenge;
   /* input stream devices */
   /* selector devices */
   public selectors = [];
   // containers
-  @ViewChild('overlay')
+  @ViewChild('overlay', {static: true})
   public overlay;
   // canvas 2D context
   private ctx;
-  @ViewChild('webcam')
+  @ViewChild('webcam', {static: true})
   public video;
 
   // stream video
@@ -37,9 +34,6 @@ export class DetectorComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   private detectId;
-
-  // preview
-  lastUsers: User[];
 
   // alert
   alertContainer = false;
@@ -60,7 +54,6 @@ export class DetectorComponent implements OnInit, OnDestroy {
   videoSource;
 
   // detection overlay objects detected
-  objectsOverlay: Objects[] = [];
   objectsDictionary: Objects[] = [];
 
   // tslint:disable-next-line:max-line-length
@@ -69,8 +62,6 @@ export class DetectorComponent implements OnInit, OnDestroy {
 
   constructor(
     public dialog: MatDialog,
-    private hubService: HubService,
-    private challengeService: ChallengeService,
     private predictionService: CustomVisionPredictionService,
     private bottomSheet: MatBottomSheet,
     private sanitizer: DomSanitizer,
@@ -84,10 +75,7 @@ export class DetectorComponent implements OnInit, OnDestroy {
     if (localStorage.getItem('videoSource')) {
       this.videoSource = localStorage.getItem('videoSource');
     }
-    // init detected objects array
-    this.objectsOverlay = [];
     // init lock
-    this.lastUsers = [];
     this.alertContainer = false;
     this.stateContainer = false;
     // save canvas context
@@ -102,25 +90,10 @@ export class DetectorComponent implements OnInit, OnDestroy {
     }
 
     // set objects retrieved from challenge
-    if (localStorage.getItem('challengesData')) {
-      const filteredChallenge = JSON.parse(localStorage.getItem('challengesData')).filter(x => x.appName === 'scanner');
-      if (filteredChallenge.length > 0) {
-        this.challenge = filteredChallenge[0];
-        console.log( this.challenge);
-        this.objectsDictionary = [];
-        // tslint:disable-next-line:no-string-literal
-        this.customVisionEndpoint = this.challenge.config.customVisionEndpoint;
-        // tslint:disable-next-line:no-string-literal
-        this.customVisionKey = this.challenge.config.customVisionKey;
-        // tslint:disable-next-line:forin
-        for (const key in this.challenge.data) {
-          this.objectsDictionary.push(new Objects(key, this.challenge.data[key]));
-        }
-      }
-    }
-
-    if (localStorage.getItem('teamData')) {
-      this.team = JSON.parse(localStorage.getItem('teamData'));
+    if (localStorage.getItem('settings')) {
+      const settings = JSON.parse(localStorage.getItem('settings'));
+      this.customVisionEndpoint = settings.customVisionEndpoint;
+      this.customVisionKey = settings.customVisionKey;
     }
   }
 
@@ -278,33 +251,6 @@ export class DetectorComponent implements OnInit, OnDestroy {
                   p.boundingBox.height * this.overlay.nativeElement.height,
                   p.tagName
                   );
-
-                if (this.objectsOverlay.map(o => o.label).indexOf(p.tagName) === -1) {
-                  const idx = this.objectsDictionary.map(o => o.label).indexOf(p.tagName);
-
-                  const obj = this.objectsDictionary[idx];
-
-                  const croppedCanvas = this.crop(canvas,
-                    p.boundingBox.left * this.overlay.nativeElement.width,
-                    p.boundingBox.top * this.overlay.nativeElement.height,
-                    p.boundingBox.width * this.overlay.nativeElement.width,
-                    p.boundingBox.height * this.overlay.nativeElement.height);
-
-                  croppedCanvas.toBlob(
-                    (blobObject) => {
-                      const urlblob = URL.createObjectURL(blobObject);
-                      obj.image = this.sanitizer.bypassSecurityTrustUrl(urlblob);
-                    }
-                  );
-
-                  // add to overlay
-                  this.objectsOverlay.push(obj);
-
-                  // remove from overlay after 5 sec
-                  setTimeout(() => {
-                    this.objectsOverlay.pop();
-                  }, 5000);
-                }
                 console.log(p.tagName + ' ' + (p.probability * 100) + ' % ');
               }
             }
@@ -321,19 +267,6 @@ export class DetectorComponent implements OnInit, OnDestroy {
     this.detection = ' Found : ' + prediction[0].label + ' with ' + prediction[0].value + '';
     console.log(this.detection);*/
   }
-
-  openBottomSheet(o: Objects) {
-    this.bottomSheet.open(BottomSheetDetailComponent, { data: o });
-    if (this.challenge.answers.indexOf(o.label) !== -1 && this.team) {
-      console.log('object found');
-      this.challengeService.setCompleted(this.team.teamId, this.challenge.challengeId).subscribe(
-        () => {
-          console.log('challenge completed');
-        }
-      );
-    }
-  }
-
   private stopCaptureStream() {
       // stop camera capture
       if (this.stream) {
@@ -350,17 +283,6 @@ export class DetectorComponent implements OnInit, OnDestroy {
       this.detectId = null;
       this.stream = null;
       // stop game context signal
-      if (localStorage.getItem('gameData')) {
-        if (this.hubServiceSub) {
-          this.hubServiceSub.unsubscribe();
-        }
-        if (this.gameSub) {
-          this.gameSub.unsubscribe();
-        }
-        if (this.hubService.connected.isStopped) {
-          this.hubService.stopService();
-        }
-      }
     }
 
 
