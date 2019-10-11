@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -8,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 export class SettingsComponent implements OnInit {
   public endpoint: string;
   public key: string;
-  constructor() {
+  constructor(private router: Router) {
     if (localStorage.getItem('settings')) {
       const settings = JSON.parse(localStorage.getItem('settings'));
       this.endpoint = settings.customVisionEndpoint;
@@ -23,7 +24,8 @@ export class SettingsComponent implements OnInit {
       customVisionEndpoint: this.endpoint,
       customVisionKey: this.key,
     };
-    localStorage.setItem('settings',JSON.stringify(settings));
+    localStorage.setItem('settings', JSON.stringify(settings));
+    this.router.navigate(['/scanner']);
   }
 
 }
