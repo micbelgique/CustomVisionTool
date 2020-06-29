@@ -59,6 +59,7 @@ export class DetectorComponent implements OnInit, OnDestroy {
   // tslint:disable-next-line:max-line-length
   private customVisionEndpoint = 'InsertYourCustomVisionEndpoint';
   private customVisionKey = 'InsertYourCustomVisionKey';
+  private isStoringImage = 'false';
 
   constructor(
     public dialog: MatDialog,
@@ -94,6 +95,7 @@ export class DetectorComponent implements OnInit, OnDestroy {
       const settings = JSON.parse(localStorage.getItem('settings'));
       this.customVisionEndpoint = settings.customVisionEndpoint;
       this.customVisionKey = settings.customVisionKey;
+      this.isStoringImage = settings.isStoringImage;
     }
   }
 
@@ -238,7 +240,12 @@ export class DetectorComponent implements OnInit, OnDestroy {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0);
     canvas.toBlob((blob) => {
-      const detection$ = this.predictionService.predictImageWithNoStore(blob, this.customVisionEndpoint, this.customVisionKey);
+      let detection$: Observable<ImagePrediction>;
+      if (this.isStoringImage) {
+        detection$ = this.predictionService.predictImage(blob, this.customVisionEndpoint, this.customVisionKey);
+      } else {
+        detection$ = this.predictionService.predictImageWithNoStore(blob, this.customVisionEndpoint, this.customVisionKey);
+      }
       detection$.subscribe(
         (predictions: any) => {
           predictions.predictions.forEach(

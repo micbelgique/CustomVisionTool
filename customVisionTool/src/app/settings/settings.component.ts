@@ -9,11 +9,13 @@ import { Router } from '@angular/router';
 export class SettingsComponent implements OnInit {
   public endpoint: string;
   public key: string;
+  public storeImage: boolean;
   constructor(private router: Router) {
     if (localStorage.getItem('settings')) {
       const settings = JSON.parse(localStorage.getItem('settings'));
       this.endpoint = settings.customVisionEndpoint;
       this.key = settings.customVisionKey;
+      this.storeImage = settings.isStoringImage;
     }
    }
 
@@ -23,6 +25,7 @@ export class SettingsComponent implements OnInit {
     const settings = {
       customVisionEndpoint: this.endpoint,
       customVisionKey: this.key,
+      isStoringImage: this.storeImage,
     };
     localStorage.setItem('settings', JSON.stringify(settings));
     this.router.navigate(['/scanner']);
