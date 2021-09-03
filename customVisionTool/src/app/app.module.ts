@@ -33,12 +33,14 @@ import {
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SettingsComponent } from './settings/settings.component';
+import { TestLocalComponent } from './test-local/test-local.component';
 @NgModule({
   declarations: [
     AppComponent,
     BottomSheetDetailComponent,
     DetectorComponent,
     SettingsComponent,
+    TestLocalComponent,
   ],
   imports: [
     BrowserModule,
