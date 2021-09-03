@@ -1,14 +1,47 @@
-<mat-card class='settings'>
-        <mat-form-field class="example-full-width">
-          <input matInput placeholder="Put customvision endpoint" [(ngModel)]="endpoint">
-        </mat-form-field>
-      
-        <mat-form-field class="example-full-width">
-            <input matInput placeholder="Put customvision key" [(ngModel)]="key">
-          </mat-form-field>
-          <mat-slide-toggle [(ngModel)]="storeImage"
-          class="example-full-width">
-        Storing image?
-      </mat-slide-toggle>
-      <button mat-raised-button color="primary" (click)="setEndpointsAndKey()" class="example-full-width">Save</button>
+<mat-card class="settings">
+  <mat-slide-toggle [(ngModel)]="isLocal" class="example-full-width">
+    Working localy?
+  </mat-slide-toggle>
+  <div *ngIf="this.isLocal">
+    <mat-form-field class="example-full-width">
+      <input
+        matInput
+        placeholder="Put model blob link"
+        [(ngModel)]="modelEndpoint"
+      />
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width">
+      <input
+        matInput
+        placeholder="Put model labels blob"
+        [(ngModel)]="modelLabel"
+      />
+    </mat-form-field>
+  </div>
+  <div *ngIf="!this.isLocal">
+    <mat-form-field class="example-full-width">
+      <input
+        matInput
+        placeholder="Put customvision endpoint"
+        [(ngModel)]="endpoint"
+      />
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width">
+      <input matInput placeholder="Put customvision key" [(ngModel)]="key" />
+    </mat-form-field>
+    <mat-slide-toggle [(ngModel)]="isStoringImage" class="example-full-width">
+      Storing image?
+    </mat-slide-toggle>
+  </div>
+
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="setEndpointsAndKey()"
+    class="example-full-width"
+  >
+    Save
+  </button>
 </mat-card>
