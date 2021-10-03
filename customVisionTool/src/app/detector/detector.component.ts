@@ -97,7 +97,7 @@ export class DetectorComponent implements OnInit, OnDestroy {
       this.isLocal = settings.isLocal;
       this.modelEndpoint = settings.modelEndpoint;
       this.modelLabel = settings.modelLabel;
-      this.purcent = Number.parseInt(settings.purcent);
+      this.purcent = Number.parseFloat(settings.purcent);
     }
     this.loadModel();
     this.detectId = null;
@@ -302,6 +302,7 @@ export class DetectorComponent implements OnInit, OnDestroy {
     if (this.loadedModel) {
       console.log("Working offline");
       const result = await this.model.executeAsync(canvas);
+      console.log(this.purcent);
       // tslint:disable-next-line: prefer-for-of
       for (let index = 0; index < result[0].length; index++) {
         if (result[1][index] > this.purcent) {
