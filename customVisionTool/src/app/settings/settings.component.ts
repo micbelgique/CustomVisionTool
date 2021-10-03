@@ -13,6 +13,7 @@ export class SettingsComponent implements OnInit {
   public key: string;
   public isStoringImage: boolean;
   public isLocal: boolean;
+  public purcent: string;
   constructor(private router: Router) {
     if (localStorage.getItem("settings")) {
       const settings = JSON.parse(localStorage.getItem("settings"));
@@ -22,6 +23,7 @@ export class SettingsComponent implements OnInit {
       this.isLocal = settings.isLocal;
       this.modelEndpoint = settings.modelEndpoint;
       this.modelLabel = settings.modelLabel;
+      this.purcent = settings.purcent;
     }
   }
 
@@ -34,6 +36,7 @@ export class SettingsComponent implements OnInit {
       isLocal: this.isLocal,
       modelEndpoint: this.modelEndpoint,
       modelLabel: this.modelLabel,
+      purcent: this.purcent,
     };
     localStorage.setItem("settings", JSON.stringify(settings));
     this.router.navigate(["/scanner"]);

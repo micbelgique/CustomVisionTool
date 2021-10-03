@@ -65,6 +65,7 @@ export class DetectorComponent implements OnInit, OnDestroy {
   private file;
   private labl = [];
   private loadedModel = false;
+  private purcent = 0;
 
   constructor(
     public dialog: MatDialog,
@@ -96,6 +97,7 @@ export class DetectorComponent implements OnInit, OnDestroy {
       this.isLocal = settings.isLocal;
       this.modelEndpoint = settings.modelEndpoint;
       this.modelLabel = settings.modelLabel;
+      this.purcent = Number.parseInt(settings.purcent);
     }
     this.loadModel();
     this.detectId = null;
@@ -281,7 +283,7 @@ export class DetectorComponent implements OnInit, OnDestroy {
       }
       detection$.subscribe((predictions: any) => {
         predictions.predictions.forEach((p) => {
-          if (p.probability >= 0.6) {
+          if (p.probability >= this.purcent) {
             this.drawOverlay(
               p.boundingBox.left * this.overlay.nativeElement.width,
               p.boundingBox.top * this.overlay.nativeElement.height,
@@ -302,7 +304,7 @@ export class DetectorComponent implements OnInit, OnDestroy {
       const result = await this.model.executeAsync(canvas);
       // tslint:disable-next-line: prefer-for-of
       for (let index = 0; index < result[0].length; index++) {
-        if (result[1][index] > 0.4) {
+        if (result[1][index] > this.purcent) {
           const w =
             result[0][index][2] * this.overlay.nativeElement.width -
             result[0][index][0] * this.overlay.nativeElement.width;
